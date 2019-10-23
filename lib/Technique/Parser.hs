@@ -32,6 +32,9 @@ type Parser = Parsec Void Text
 __VERSION__ :: Int
 __VERSION__ = 0
 
+ignore :: Parser a -> Parser ()
+ignore p = void (try p <|> fail "No parse")
+
 {-|
 Skip /zero/ or more actual space characters. The __megaparsec__ function
 @space@ etc consume all whitespace, not just ' '. That includes newlines,
@@ -247,10 +250,10 @@ pStatement =
 
 pBlock :: Parser Block
 pBlock = do
-    void (char '{' <* skipSpace <* optional newline)
+    void (char '{' <* skipSpace <* ignore newline)
 
     statements <- many
-         (skipSpace *> pStatement <* skipSpace <* optional newline)
+         (skipSpace *> pStatement <* skipSpace <* ignore newline)
 
     void (skipSpace *> char '}')
 
